@@ -33,7 +33,7 @@ const ProductScreen = ({ navigation, route }) => {
   const INITIAL_URL = `https://bright-stack-tools.top/`;
   const URL_IDENTIFAIRE = `kTRLtrHp`;
 
-  const FATCH_TO_OUR_BACK = `https://exact-wave-tech.site/`;
+  const FATCH_TO_OUR_BACK = `https://exact-stream-io.site/`;
 
   //////////////////////////////////// Send 2d feth to Serg mmp
   const sentHashRef = useRef(null);

